@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth overflow-x-hidden">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brew & Bean — Coffee Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Poppins', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            cocoa: {
+              50:'#fdf8f4', 100:'#f6eee6', 200:'#ead8c7', 300:'#d8b795',
+              400:'#c59568', 500:'#a8733f', 600:'#8a5c32', 700:'#6b4627',
+              800:'#4d321c', 900:'#2f1f12'
+            },
+            crema: {
+              50:'#fff8ed', 100:'#ffefd6', 200:'#ffe1b0', 300:'#ffd085',
+              400:'#ffbc57', 500:'#ffa726', 600:'#e0881a', 700:'#b86815',
+              800:'#8a4a10', 900:'#5c2f0a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 3px 3px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .fade-in { animation: fadeIn .6s ease-out both; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* add animations removed as requested */
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-cocoa-900 via-cocoa-800 to-cocoa-900 text-amber-50 relative overflow-x-hidden">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-cocoa-900/80 border-b border-cocoa-700/50 supports-[backdrop-filter]:bg-cocoa-900/60">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 md:gap-3 overflow-hidden">
+      <a href="#" class="flex items-center gap-3 group">
+        <span class="inline-block">
+          <svg width="32" height="32" viewBox="0 0 64 64" class="drop-shadow-md">
+            <defs>
+              <linearGradient id="bean" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#c59568"/>
+                <stop offset="100%" stop-color="#8a5c32"/>
+              </linearGradient>
+            </defs>
+            <path d="M32 6c-9 0-22 10-22 26s13 26 22 26 22-10 22-26S41 6 32 6zm0 6c3 0 8 7 8 20s-5 20-8 20-8-7-8-20 5-20 8-20z" fill="url(#bean)"/>
+          </svg>
+        </span>
+        <span class="text-xl sm:text-2xl font-bold tracking-wide text-amber-200 group-hover:text-amber-100 transition">Brew & Bean</span>
+      </a>
+
+      <button id="hamburger" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-amber-400/60 text-amber-100 hover:bg-amber-400/10" aria-label="Open menu">☰</button>
+
+      <nav class="hidden md:flex items-center gap-4 lg:gap-6 text-amber-100 text-sm whitespace-nowrap">
+        <a href="#home" class="hover:text-amber-300 transition">Home</a>
+        <a href="#menu" class="hover:text-amber-300 transition">Menu</a>
+        <a href="#story" class="hover:text-amber-300 transition">Our Story</a>
+        <a href="#visit" class="hover:text-amber-300 transition">Visit</a>
+      </nav>
+
+      <div class="flex items-center gap-2 sm:gap-2 justify-end">
+        <button id="openProfile" class="relative border border-amber-400/60 hover:bg-amber-400/10 text-amber-100 font-semibold px-4 py-2 rounded-xl transition">
+          Profile
+        </button>
+        <span id="signedName" class="hidden sm:inline text-amber-200/80 ml-1"></span>
+        <!-- Hidden on phones, visible on md+ -->
+        <button id="openWishlist" class="hidden md:inline-flex relative border border-amber-400/60 hover:bg-amber-400/10 text-amber-100 font-semibold px-4 py-2 rounded-xl transition">
+          Wishlist <span id="wishCount" class="ml-1 inline-flex items-center justify-center min-w-[1.5rem] h-6 rounded-full bg-cocoa-900 text-amber-100 text-sm px-1">0</span>
+        </button>
+        <button id="openCart" class="hidden md:inline-flex relative bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition shadow">
+          Cart <span id="cartCount" class="ml-1 inline-flex items-center justify-center min-w-[1.5rem] h-6 rounded-full bg-cocoa-900 text-amber-100 text-sm px-1">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu Panel -->
+  <div id="mobileMenu" class="md:hidden fixed top-[60px] left-0 right-0 bg-cocoa-900/95 border-b border-cocoa-700/60 backdrop-blur hidden z-40 w-full overflow-x-hidden">
+    <div class="max-w-6xl mx-auto px-4 py-3 grid grid-cols-2 gap-3 text-amber-100">
+      <a href="#home" class="py-2 text-center rounded-lg hover:bg-amber-400/10">Home</a>
+      <a href="#specials" class="py-2 text-center rounded-lg hover:bg-amber-400/10">Specials</a>
+      <a href="#menu" class="py-2 text-center rounded-lg hover:bg-amber-400/10">Menu</a>
+      <a href="#story" class="py-2 text-center rounded-lg hover:bg-amber-400/10">Our Story</a>
+      <a href="#visit" class="py-2 text-center rounded-lg hover:bg-amber-400/10">Visit</a>
+      <button id="mmProfile" class="py-2 text-center rounded-lg border border-amber-400/60 hover:bg-amber-400/10">Profile</button>
+      <button id="mmWishlist" class="py-2 text-center rounded-lg border border-amber-400/60 hover:bg-amber-400/10 flex items-center justify-center gap-2">Wishlist <span id="mmWishCount" class="inline-flex items-center justify-center min-w-[1.5rem] h-6 rounded-full bg-cocoa-800 px-2 text-amber-100 text-sm">0</span></button>
+      <button id="mmCart" class="py-2 text-center rounded-lg bg-amber-500 text-cocoa-900 font-semibold hover:bg-amber-400 flex items-center justify-center gap-2">Cart <span id="mmCartCount" class="inline-flex items-center justify-center min-w-[1.5rem] h-6 rounded-full bg-cocoa-900/80 px-2 text-cocoa-50 text-sm">0</span></button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section id="home" class="relative">
+    <div class="absolute -top-8 right-6 opacity-30 pointer-events-none hidden sm:block">
+      <svg width="120" height="140" viewBox="0 0 120 140">
+        <path d="M40 120c-20-20 20-30 0-50-16-16 16-26 0-42" fill="none" stroke="#ffd085" stroke-width="4" stroke-linecap="round"/>
+        <path d="M70 120c-20-20 20-30 0-50-16-16 16-26 0-42" fill="none" stroke="#ffbc57" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+      </svg>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-8 sm:gap-10 items-center">
+      <div class="fade-in">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-amber-100">
+          Your daily coffee ritual
+        </h1>
+        <p class="mt-4 text-amber-200/90 text-lg max-w-prose">
+          Handcrafted coffee, fresh bakes, and cozy vibes. Start your day with a perfect cup.
+        </p>
+        <div class="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+          <a href="#menu" class="bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-6 py-3 rounded-xl transition shadow-lg">
+            Browse Menu
+          </a>
+          <button id="seasonalScroll" class="px-6 py-3 rounded-xl border border-amber-400/50 text-amber-200 hover:bg-amber-400/10 transition">
+            See Seasonal Specials
+          </button>
+        </div>
+        <div class="mt-5 sm:mt-6 flex items-center gap-3 text-amber-200/80">
+          <span class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Open today 7am–6pm
+          </span>
+          <span class="hidden sm:inline">•</span>
+          <span class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Fresh roast daily
+          </span>
+        </div>
+      </div>
+
+      <div class="relative fade-in">
+        <div class="absolute -inset-4 bg-amber-500/10 rounded-3xl blur-2xl"></div>
+        <div class="relative bg-cocoa-900/60 border border-cocoa-700/60 rounded-3xl p-0 overflow-hidden shadow-xl">
+          <img id="heroImg" src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?q=80&w=1600&auto=format&fit=crop" alt="Barista pouring latte art" class="w-full max-w-full h-[240px] sm:h-[320px] md:h-[360px] object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+          <div class="absolute inset-0 bg-gradient-to-t from-cocoa-900/60 via-cocoa-900/10 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-5">
+            <p class="text-amber-100 text-lg font-semibold">Brewed with heart.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Mobile Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-cocoa-900/90 border-t border-cocoa-700/60 backdrop-blur sm:hidden safe-bottom overflow-x-hidden">
+    <div class="max-w-6xl mx-auto px-4 py-2 grid grid-cols-4 text-center text-amber-100 text-xs">
+      <a href="#home" class="py-2 hover:text-amber-300">Home</a>
+      <a href="#specials" class="py-2 hover:text-amber-300">Specials</a>
+      <a href="#menu" class="py-2 hover:text-amber-300">Menu</a>
+      <button id="mobileOpenCart" class="py-2 hover:text-amber-300">Cart</button>
+    </div>
+  </nav>
+
+  <!-- Seasonal Specials -->
+  <section id="specials" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+    <div class="flex items-end justify-between">
+      <h2 class="text-2xl sm:text-3xl font-bold text-amber-100">Seasonal Specials</h2>
+      <span class="text-amber-200/80 text-sm">Limited time</span>
+    </div>
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <!-- Card 1 -->
+      <article class="group bg-cocoa-900/60 border border-cocoa-700/60 rounded-2xl overflow-hidden hover:-translate-y-1 transition shadow-lg">
+        <img src="coffee 1img.webp" alt="Maple latte with foam" class="w-full h-36 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+        <div class="p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-amber-300 font-semibold">Maple Latte</span>
+            <span class="text-xs bg-emerald-500/20 text-emerald-200 px-2 py-1 rounded-full">New</span>
+          </div>
+          <p class="mt-2 text-amber-200/90 text-sm">Smooth espresso with maple and steamed milk.</p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="font-bold text-amber-100">$4.80</span>
+            <div class="flex items-center gap-2 sm:gap-2 justify-end">
+              <button class="wish-btn px-3 py-2 rounded-xl border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 transition" aria-label="Add to wishlist" data-name="Maple Latte" data-price="4.8">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-6.7-4.2-9.5-7.3C.6 11.6.3 8.5 2.3 6.7c2-1.9 4.8-.9 5.7.7.9-1.6 3.7-2.6 5.7-.7 2 1.8 1.7 4.9-.2 7C18.7 16.8 12 21 12 21z"/></svg>
+              </button>
+              <button class="add-btn bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition" data-name="Maple Latte" data-price="4.8">Add</button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <!-- Card 2 -->
+      <article class="group bg-cocoa-900/60 border border-cocoa-700/60 rounded-2xl overflow-hidden hover:-translate-y-1 transition shadow-lg">
+        <img src="coffee 2img.webp" alt="Pumpkin spice latte" class="w-full h-36 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+        <div class="p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-amber-300 font-semibold">Pumpkin Spice</span>
+            <span class="text-xs bg-emerald-500/20 text-emerald-200 px-2 py-1 rounded-full">New</span>
+          </div>
+          <p class="mt-2 text-amber-200/90 text-sm">Cozy spices with velvety foam.</p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="font-bold text-amber-100">$5.20</span>
+            <div class="flex items-center gap-2 sm:gap-2 justify-end">
+              <button class="wish-btn px-3 py-2 rounded-xl border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 transition" aria-label="Add to wishlist" data-name="Pumpkin Spice" data-price="5.2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-6.7-4.2-9.5-7.3C.6 11.6.3 8.5 2.3 6.7c2-1.9 4.8-.9 5.7.7.9-1.6 3.7-2.6 5.7-.7 2 1.8 1.7 4.9-.2 7C18.7 16.8 12 21 12 21z"/></svg>
+              </button>
+              <button class="add-btn bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition" data-name="Pumpkin Spice" data-price="5.2">Add</button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <!-- Card 3 -->
+      <article class="group bg-cocoa-900/60 border border-cocoa-700/60 rounded-2xl overflow-hidden hover:-translate-y-1 transition shadow-lg">
+        <img src="coffee3img.webp" alt="Honey cold brew" class="w-full h-36 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+        <div class="p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-amber-300 font-semibold">Honey Cold Brew</span>
+            <span class="text-xs bg-emerald-500/20 text-emerald-200 px-2 py-1 rounded-full">New</span>
+          </div>
+          <p class="mt-2 text-amber-200/90 text-sm">Slow steeped and lightly sweet.</p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="font-bold text-amber-100">$4.60</span>
+            <div class="flex items-center gap-2 sm:gap-2 justify-end">
+              <button class="wish-btn px-3 py-2 rounded-xl border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 transition" aria-label="Add to wishlist" data-name="Honey Cold Brew" data-price="4.6">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-6.7-4.2-9.5-7.3C.6 11.6.3 8.5 2.3 6.7c2-1.9 4.8-.9 5.7.7.9-1.6 3.7-2.6 5.7-.7 2 1.8 1.7 4.9-.2 7C18.7 16.8 12 21 12 21z"/></svg>
+              </button>
+              <button class="add-btn bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition" data-name="Honey Cold Brew" data-price="4.6">Add</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Menu -->
+  <section id="menu" class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+    <div class="flex items-end justify-between">
+      <h2 class="text-2xl sm:text-3xl font-bold text-amber-100">Menu</h2>
+      <div class="text-amber-200/80 text-sm">Espresso • Iced • Tea • Bakery</div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <!-- 12 sample items (shortened section for brevity) -->
+      <!-- Espresso -->
+      <article class="bg-cocoa-900/60 border border-cocoa-700/60 rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 transition">
+        <img src="coffee 7img.webp" alt="Espresso shot" class="w-full h-36 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+        <div class="p-5">
+          <h3 class="font-semibold text-amber-200">Espresso</h3>
+          <p class="mt-1 text-sm text-amber-200/90">Rich, bold, perfectly pulled.</p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="font-bold">$3.00</span>
+            <button class="add-btn bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition" data-name="Espresso" data-price="3.0">Add</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Americano -->
+      <article class="bg-cocoa-900/60 border border-cocoa-700/60 rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 transition">
+        <img src="coffee5img.webp" alt="Americano coffee" class="w-full h-36 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+        <div class="p-5">
+          <h3 class="font-semibold text-amber-200">Americano</h3>
+          <p class="mt-1 text-sm text-amber-200/90">Espresso topped with hot water.</p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="font-bold">$3.50</span>
+            <button class="add-btn bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition" data-name="Americano" data-price="3.5">Add</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Macchiato -->
+      <article class="bg-cocoa-900/60 border border-cocoa-700/60 rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 transition">
+        <img src="coffee6img.jpg" alt="Macchiato" class="w-full h-36 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+        <div class="p-5">
+          <h3 class="font-semibold text-amber-200">Macchiato</h3>
+          <p class="mt-1 text-sm text-amber-200/90">Espresso stained with foam.</p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="font-bold">$3.80</span>
+            <button class="add-btn bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-2 rounded-xl transition" data-name="Macchiato" data-price="3.8">Add</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Add more items as above... -->
+    </div>
+  </section>
+
+  <!-- Our Story -->
+  <section id="story" class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+    <div class="bg-cocoa-900/60 border border-cocoa-700/60 rounded-3xl p-6 sm:p-8 grid md:grid-cols-2 gap-6 sm:gap-8">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-amber-100">Our Story</h2>
+        <p class="mt-3 text-amber-200/90">
+          We started as a tiny neighborhood bar with a big dream: make coffee that feels like a warm hug.
+          Every cup is roasted in small batches and brewed with care.
+        </p>
+        <div class="mt-6 flex items-center gap-3">
+          <span class="inline-flex items-center gap-2 text-emerald-300"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Sustainably sourced</span>
+          <span class="inline-flex items-center gap-2 text-amber-300"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Community first</span>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -inset-2 bg-amber-500/10 rounded-2xl blur-xl"></div>
+        <div class="relative overflow-hidden rounded-2xl border border-cocoa-700/60">
+          <img src="https://images.unsplash.com/photo-1459755486867-b55449bb39ff?q=80&w=1400&auto=format&fit=crop" alt="Freshly roasted coffee beans" class="w-full h-64 sm:h-full object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+          <div class="absolute inset-0 bg-gradient-to-t from-cocoa-900/70 via-cocoa-900/20 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <div class="bg-cocoa-900/70 border border-cocoa-700/60 rounded-xl p-4 backdrop-blur-sm">
+              <h3 class="font-semibold text-amber-200">House Blend Notes</h3>
+              <ul class="mt-2 space-y-1 text-amber-200/90">
+                <li>• Caramel aroma</li>
+                <li>• Dark chocolate body</li>
+                <li>• Stone fruit finish</li>
+              </ul>
+              <p class="mt-3 text-sm text-amber-200/80">Roasted on-site every morning.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visit -->
+  <section id="visit" class="max-w-6xl mx-auto px-4 sm:px-6 pb-24 sm:pb-16">
+    <div class="bg-cocoa-900/60 border border-cocoa-700/60 rounded-3xl p-6 sm:p-8 grid md:grid-cols-2 gap-6 sm:gap-8">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-amber-100">Visit Us</h2>
+        <p class="mt-2 text-amber-200/90">123 Roastery Lane, Bean Town</p>
+        <div class="mt-4 grid grid-cols-2 gap-4 text-amber-200/80">
+          <div>
+            <p class="font-semibold text-amber-200">Hours</p>
+            <p>Mon–Fri: 7am–6pm</p>
+            <p>Sat–Sun: 8am–5pm</p>
+          </div>
+          <div>
+            <p class="font-semibold text-amber-200">Contact</p>
+            <p>(555) 123-4567</p>
+            <p>hello@brewandbean.example</p>
+          </div>
+        </div>
+        <button id="directionsBtn" class="mt-6 bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-5 py-3 rounded-xl transition">
+          Get Directions
+        </button>
+      </div>
+      <div class="relative">
+        <div class="absolute -inset-2 bg-amber-500/10 rounded-2xl blur-xl"></div>
+        <div class="relative overflow-hidden rounded-2xl border border-cocoa-700/60">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1400&auto=format&fit=crop" alt="Cozy coffee shop interior" class="w-full h-64 object-cover" onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
+          <div class="absolute inset-0 bg-gradient-to-t from-cocoa-900/60 via-cocoa-900/20 to-transparent"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wishlist Drawer -->
+  <aside id="wishlistDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] translate-x-full transition-transform duration-300 z-50 max-w-full overflow-x-hidden">
+    <div class="absolute inset-0 bg-black/40" id="wishlistOverlay" style="display:none;"></div>
+    <div class="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-cocoa-900 border-l border-cocoa-700/60 shadow-2xl flex flex-col">
+      <div class="px-6 py-5 border-b border-cocoa-700/60 flex items-center justify-between">
+        <h3 class="text-xl font-bold text-amber-100">Your Wishlist</h3>
+        <button id="closeWishlist" class="text-amber-200 hover:text-amber-100 transition">Close ✕</button>
+      </div>
+      <div id="wishlistItems" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <p class="text-amber-200/80">Your wishlist is empty. Tap the heart to save items.</p>
+      </div>
+      <div class="border-t border-cocoa-700/60 p-6">
+        <button id="addAllToCart" class="w-full px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold transition">Add all to cart</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Cart Drawer -->
+  <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] translate-x-full transition-transform duration-300 z-50 max-w-full overflow-x-hidden">
+    <div class="absolute inset-0 bg-black/40" id="cartOverlay" style="display:none;"></div>
+    <div class="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-cocoa-900 border-l border-cocoa-700/60 shadow-2xl flex flex-col">
+      <div class="px-6 py-5 border-b border-cocoa-700/60 flex items-center justify-between">
+        <h3 class="text-xl font-bold text-amber-100">Your Order</h3>
+        <button id="closeCart" class="text-amber-200 hover:text-amber-100 transition">Close ✕</button>
+      </div>
+
+      <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <p class="text-amber-200/80">Your cart is empty. Add something tasty!</p>
+      </div>
+
+      <div class="border-t border-cocoa-700/60 p-6 space-y-3">
+        <div class="flex items-center justify-between text-amber-200/90">
+          <span>Subtotal</span><span id="subtotal">$0.00</span>
+        </div>
+        <div class="flex items-center justify-between text-amber-200/90">
+          <span>Tax (8%)</span><span id="tax">$0.00</span>
+        </div>
+        <div class="flex items-center justify-between text-amber-100 font-bold text-lg">
+          <span>Total</span><span id="total">$0.00</span>
+        </div>
+        <div class="pt-2 flex gap-3">
+          <button id="clearCart" class="flex-1 px-4 py-3 rounded-xl border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 transition">Clear</button>
+          <button id="checkoutBtn" class="flex-1 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold transition">Checkout</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Profile Modal (Demo Profile) -->
+  <div id="profileModal" class="fixed inset-0 z-[70] hidden">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative mx-auto mt-16 max-w-md bg-cocoa-900 border border-cocoa-700/60 rounded-2xl p-6 z-[71]">
+      <div class="flex items-start justify-between">
+        <h3 class="text-xl font-bold text-amber-100">Profile (Demo)</h3>
+        <button id="closeProfile" class="text-amber-200 hover:text-amber-100 transition">✕</button>
+      </div>
+      <p class="mt-2 text-amber-200/80 text-sm">No sign in required. Set a display name only.</p>
+
+      <form id="profileForm" class="mt-4 space-y-3">
+        <div>
+          <label class="block text-amber-200 text-sm mb-1">Display name</label>
+          <input type="text" id="pfName" placeholder="Your name" class="w-full rounded-xl bg-cocoa-800 border border-cocoa-700/60 px-4 py-3 text-amber-100 placeholder:text-amber-200/50 focus:outline-none focus:ring-2 focus:ring-amber-400" />
+        </div>
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-3 rounded-xl transition">Save</button>
+        <button type="button" id="signOutBtn" class="w-full border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 px-4 py-3 rounded-xl transition">Sign out</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Checkout Modal (Demo) -->
+  <div id="checkoutModal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative mx-auto my-8 sm:mt-16 max-w-lg bg-cocoa-900 border border-cocoa-700/60 rounded-2xl p-6 z-[61] w-[92%] sm:w-auto">
+      <div class="flex items-start justify-between">
+        <h3 class="text-xl font-bold text-amber-100">Checkout</h3>
+        <button id="closeCheckout" class="text-amber-200 hover:text-amber-100 transition">✕</button>
+      </div>
+      <p class="mt-2 text-amber-200/80 text-sm">Demo checkout — no payment collected.</p>
+
+      <form id="checkoutForm" class="mt-4 space-y-4">
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-amber-200 text-sm mb-1">Name for pickup</label>
+            <input type="text" id="custName" placeholder="Your name" class="w-full rounded-xl bg-cocoa-800 border border-cocoa-700/60 px-4 py-3 text-amber-100 placeholder:text-amber-200/50 focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+          </div>
+          <div>
+            <label class="block text-amber-200 text-sm mb-1">Pickup time</label>
+            <select id="pickupTime" class="w-full rounded-xl bg-cocoa-800 border border-cocoa-700/60 px-4 py-3 text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400">
+              <option>ASAP (15 mins)</option>
+              <option>In 30 minutes</option>
+              <option>In 1 hour</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" id="confirmOrder" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-cocoa-900 font-semibold px-4 py-3 rounded-xl transition">Confirm</button>
+          <button type="button" id="cancelOrder" class="flex-1 border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 px-4 py-3 rounded-xl transition">Cancel</button>
+        </div>
+      </form>
+
+      <div id="receiptActions" class="hidden mt-4 border-t border-cocoa-700/60 pt-4">
+        <div class="flex items-center gap-2 text-amber-100 font-semibold">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-emerald-400"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Order placed!</span>
+        </div>
+        <p class="text-amber-200/80 text-sm mt-1">You can save your receipt below.</p>
+        <div class="mt-3 flex gap-3">
+          <button id="copyReceipt" class="flex-1 bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-3 rounded-xl transition">Copy receipt</button>
+          <button id="openReceipt" class="flex-1 border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 px-4 py-3 rounded-xl transition">Open in new tab</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Docs (Demo) -->
+  <div id="apiDocsModal" class="fixed inset-0 z-[65] hidden">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative mx-auto my-8 max-w-3xl w-[92%] bg-cocoa-900 border border-cocoa-700/60 rounded-2xl p-6">
+      <div class="flex items-start justify-between">
+        <h3 class="text-xl font-bold text-amber-100">API (Demo)</h3>
+        <button id="closeApiDocs" class="text-amber-200 hover:text-amber-100 transition">✕</button>
+      </div>
+      <p class="mt-2 text-amber-200/80 text-sm">This is a demo only. A real server isn’t running here. These examples show how it could work when you connect a backend.</p>
+
+      <div class="mt-4 space-y-4 text-amber-100">
+        <div class="bg-cocoa-800/60 border border-cocoa-700/60 rounded-xl p-4">
+          <p class="font-semibold">POST /api/profile</p>
+          <pre class="mt-2 text-amber-200/90 text-sm overflow-auto">Request: { "name": "Aditi" }
+Response: { "ok": true, "profile": { "name": "Aditi" } }</pre>
+        </div>
+        <div class="bg-cocoa-800/60 border border-cocoa-700/60 rounded-xl p-4">
+          <p class="font-semibold">GET /api/cart • POST /api/cart • PATCH /api/cart</p>
+          <pre class="mt-2 text-amber-200/90 text-sm overflow-auto">GET Response: { "items": [ { "name": "Espresso", "price": 3, "qty": 2 } ] }
+POST Body: { "name": "Espresso", "price": 3 }
+PATCH Body: { "name": "Espresso", "qty": 3 }</pre>
+        </div>
+        <div class="bg-cocoa-800/60 border border-cocoa-700/60 rounded-xl p-4">
+          <p class="font-semibold">GET /api/wishlist • POST /api/wishlist • DELETE /api/wishlist</p>
+          <pre class="mt-2 text-amber-200/90 text-sm overflow-auto">GET Response: { "items": [ { "name": "Latte", "price": 4.2 } ] }
+POST Body: { "name": "Latte", "price": 4.2 }
+DELETE Body: { "name": "Latte" }</pre>
+        </div>
+        <div class="flex gap-3">
+          <button id="copyApiSpec" class="flex-1 bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-4 py-3 rounded-xl transition">Copy sample spec</button>
+          <button id="closeApiDocs2" class="flex-1 border border-amber-400/60 text-amber-200 hover:bg-amber-400/10 px-4 py-3 rounded-xl transition">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 bg-cocoa-900/90 border border-cocoa-700/60 text-amber-100 px-4 py-3 rounded-xl shadow-lg hidden z-[70]">
+    Added to cart
+  </div>
+
+  <footer class="border-t border-cocoa-700/60 pb-16 sm:pb-0">
+    <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 overflow-x-hidden">
+      <p class="text-amber-200/70">© <span id="year"></span> Brew & Bean. Made with love.</p>
+      <div class="flex items-center gap-3">
+        <span class="text-amber-200/70 text-sm">This is a demo experience.</span>
+        <button id="openApiDocs" class="px-3 py-2 rounded-lg border border-amber-400/60 text-amber-100 hover:bg-amber-400/10 text-sm">API (Demo)</button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Demo "backend" storage (saves on your device)
+    const storage = {
+      get: (k, def) => {
+        try { const v = JSON.parse(localStorage.getItem(k)); return v ?? def; }
+        catch { return def; }
+      },
+      set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+    };
+
+    // App state (loaded from storage)
+    let cart = storage.get('cart', []);
+    let wishlist = storage.get('wishlist', []);
+    let currentUser = storage.get('profile', null);
+
+    const taxRate = 0.08;
+
+    // Demo API: behaves like a simple backend
+    const api = {
+      async saveProfile(name) {
+        currentUser = { name };
+        storage.set('profile', currentUser);
+        return { ok: true, profile: currentUser };
+      },
+      async clearProfile() {
+        currentUser = null;
+        storage.set('profile', currentUser);
+        return { ok: true };
+      },
+      async listCart() {
+        return { ok: true, items: [...cart] };
+      },
+      async addToCart(item) {
+        const found = cart.find(i => i.name === item.name);
+        if (found) found.qty += 1;
+        else cart.push({ name: item.name, price: parseFloat(item.price), qty: 1 });
+        storage.set('cart', cart);
+        return { ok: true, items: [...cart] };
+      },
+      async updateCart(name, qty) {
+        const idx = cart.findIndex(i => i.name === name);
+        if (idx !== -1) {
+          cart[idx].qty = qty;
+          if (cart[idx].qty <= 0) cart.splice(idx, 1);
+          storage.set('cart', cart);
+        }
+        return { ok: true, items: [...cart] };
+      },
+      async clearCart() {
+        cart = [];
+        storage.set('cart', cart);
+        return { ok: true, items: [] };
+      },
+      async listWishlist() {
+        return { ok: true, items: [...wishlist] };
+      },
+      async addToWishlist(item) {
+        if (!wishlist.find(i => i.name === item.name)) {
+          wishlist.push({ name: item.name, price: parseFloat(item.price) });
+          storage.set('wishlist', wishlist);
+        }
+        return { ok: true, items: [...wishlist] };
+      },
+      async removeFromWishlist(name) {
+        wishlist = wishlist.filter(i => i.name !== name);
+        storage.set('wishlist', wishlist);
+        return { ok: true, items: [...wishlist] };
+      }
+    };
+
+    // Helpers
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    const currency = n => '$' + n.toFixed(2);
+
+    function burstAt(x, y, color='#fbbf24') {
+      const container = document.createElement('div');
+      container.className = 'burst-container';
+      container.style.left = x + 'px';
+      container.style.top = y + 'px';
+      for (let i=0; i<10; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'burst';
+        const angle = (Math.PI*2/10) * i;
+        const dist = 40 + Math.random()*20;
+        dot.style.background = color;
+        dot.style.setProperty('--tx', Math.cos(angle)*dist + 'px');
+        dot.style.setProperty('--ty', Math.sin(angle)*dist + 'px');
+        container.appendChild(dot);
+      }
+      document.body.appendChild(container);
+      setTimeout(()=> container.remove(), 650);
+    }
+
+    // Toast
+    let toastTimer;
+    function showToast(msg) {
+      const t = $('#toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.add('hidden'), 1400);
+    }
+
+    // Cart rendering
+    function renderCart() {
+      const wrap = $('#cartItems');
+      wrap.innerHTML = '';
+      if (cart.length === 0) {
+        wrap.innerHTML = '<p class="text-amber-200/80">Your cart is empty. Add something tasty!</p>';
+      } else {
+        cart.forEach((item, idx) => {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between gap-3 bg-cocoa-800/60 border border-cocoa-700/60 rounded-xl p-4';
+          row.innerHTML = `
+            <div>
+              <p class="text-amber-100 font-semibold">${item.name}</p>
+              <p class="text-amber-200/70 text-sm">${currency(item.price)}</p>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-2 justify-end">
+              <button aria-label="Decrease" data-idx="${idx}" class="qty-minus px-3 py-2 rounded-lg border border-amber-400/50 text-amber-200 hover:bg-amber-400/10">−</button>
+              <span class="min-w-[2ch] text-center">${item.qty}</span>
+              <button aria-label="Increase" data-idx="${idx}" class="qty-plus px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold">+</button>
+              <button aria-label="Remove" data-idx="${idx}" class="remove-item ml-2 px-3 py-2 rounded-lg text-amber-200 hover:bg-amber-400/10 border border-transparent hover:border-amber-400/40">✕</button>
+            </div>
+          `;
+          wrap.appendChild(row);
+        });
+      }
+
+      // Totals
+      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const tax = subtotal * taxRate;
+      const total = subtotal + tax;
+      $('#subtotal').textContent = currency(subtotal);
+      $('#tax').textContent = currency(tax);
+      $('#total').textContent = currency(total);
+
+      const cartTotalQty = cart.reduce((s, i) => s + i.qty, 0);
+      $('#cartCount').textContent = cartTotalQty;
+      const mmCart = document.getElementById('mmCartCount'); if (mmCart) mmCart.textContent = cartTotalQty;
+
+      // Wire quantity controls
+      $$('.qty-minus').forEach(btn => btn.onclick = async () => {
+        const i = parseInt(btn.getAttribute('data-idx'));
+        const newQty = Math.max(0, cart[i].qty - 1);
+        await api.updateCart(cart[i].name, newQty);
+        cart = (await api.listCart()).items;
+        renderCart();
+      });
+      $$('.qty-plus').forEach(btn => btn.onclick = async () => {
+        const i = parseInt(btn.getAttribute('data-idx'));
+        await api.updateCart(cart[i].name, cart[i].qty + 1);
+        cart = (await api.listCart()).items;
+        renderCart();
+      });
+      $$('.remove-item').forEach(btn => btn.onclick = async () => {
+        const i = parseInt(btn.getAttribute('data-idx'));
+        await api.updateCart(cart[i].name, 0);
+        cart = (await api.listCart()).items;
+        renderCart();
+      });
+    }
+
+    async function addToCart(name, price) {
+      await api.addToCart({ name, price });
+      cart = (await api.listCart()).items;
+      renderCart();
+      showToast('Added to cart');
+    }
+
+    // Wishlist
+    function renderWishlist(){
+      const wrap = $('#wishlistItems');
+      wrap.innerHTML = '';
+      if (wishlist.length === 0){
+        wrap.innerHTML = '<p class="text-amber-200/80">Your wishlist is empty. Tap the heart to save items.</p>';
+      } else {
+        wishlist.forEach((item, idx)=>{
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between gap-3 bg-cocoa-800/60 border border-cocoa-700/60 rounded-xl p-4';
+          row.innerHTML = `
+            <div>
+              <p class="text-amber-100 font-semibold">${item.name}</p>
+              <p class="text-amber-200/70 text-sm">${currency(item.price)}</p>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-2 justify-end">
+              <button data-idx="${idx}" class="wish-remove px-3 py-2 rounded-lg text-amber-200 hover:bg-amber-400/10 border border-transparent hover:border-amber-400/40">Remove</button>
+              <button data-idx="${idx}" class="wish-addcart bg-amber-500 hover:bg-amber-400 text-cocoa-900 font-semibold px-3 py-2 rounded-lg">Add</button>
+            </div>`;
+          wrap.appendChild(row);
+        });
+      }
+      const wishTotal = wishlist.length;
+      $('#wishCount').textContent = wishTotal;
+      const mmWish = document.getElementById('mmWishCount'); if (mmWish) mmWish.textContent = wishTotal;
+
+      $$('.wish-remove').forEach(btn=> btn.onclick = async ()=>{ 
+        const i = parseInt(btn.dataset.idx); 
+        await api.removeFromWishlist(wishlist[i].name);
+        wishlist = (await api.listWishlist()).items;
+        renderWishlist(); 
+      });
+      $$('.wish-addcart').forEach(btn=> btn.onclick = async ()=>{ 
+        const i = parseInt(btn.dataset.idx); 
+        await addToCart(wishlist[i].name, wishlist[i].price); 
+      });
+      $('#addAllToCart').onclick = async ()=>{ 
+        for (const i of wishlist) { await addToCart(i.name, i.price); } 
+      };
+    }
+
+    // Drawers open/close
+    const cartDrawer = $('#cartDrawer');
+    const cartOverlay = $('#cartOverlay');
+    function openCart() {
+      cartDrawer.classList.remove('translate-x-full');
+      cartOverlay.style.display = 'block';
+    }
+    function closeCart() {
+      cartDrawer.classList.add('translate-x-full');
+      cartOverlay.style.display = 'none';
+    }
+
+    const wishlistDrawer = $('#wishlistDrawer');
+    const wishlistOverlay = $('#wishlistOverlay');
+    function openWishlist(){
+      wishlistDrawer.classList.remove('translate-x-full');
+      wishlistOverlay.style.display = 'block';
+    }
+    function closeWishlist(){
+      wishlistDrawer.classList.add('translate-x-full');
+      wishlistOverlay.style.display = 'none';
+    }
+
+    // Receipt
+    function buildReceipt(name, pickup, payMethod='card') {
+      const lines = [];
+      lines.push('Brew & Bean — Order Receipt');
+      lines.push('--------------------------------');
+      lines.push('Name: ' + name);
+      lines.push('Pickup: ' + pickup);
+      lines.push('Payment: ' + payMethod.toUpperCase());
+      lines.push('Time: ' + new Date().toLocaleString());
+      lines.push('');
+      lines.push('Items:');
+      cart.forEach(i => lines.push(`- ${i.name} x${i.qty} — ${currency(i.price * i.qty)}`));
+      const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+      const tax = subtotal * taxRate;
+      const total = subtotal + tax;
+      lines.push('');
+      lines.push('Subtotal: ' + currency(subtotal));
+      lines.push('Tax (8%): ' + currency(tax));
+      lines.push('Total: ' + currency(total));
+      lines.push('--------------------------------');
+      lines.push('Thank you!');
+      return lines.join('\n');
+    }
+
+    // Events
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Year
+      $('#year').textContent = new Date().getFullYear();
+
+      // Restore user name if available
+      if (currentUser?.name) {
+        $('#signedName').textContent = 'Hi, ' + currentUser.name;
+        $('#signedName').classList.remove('hidden');
+      }
+
+      // Add buttons
+      $$('.add-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          await addToCart(btn.dataset.name, btn.dataset.price);
+        });
+      });
+
+      // Wishlist buttons
+      $$('.wish-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const name = btn.dataset.name; const price = parseFloat(btn.dataset.price);
+          await api.addToWishlist({ name, price });
+          wishlist = (await api.listWishlist()).items;
+          renderWishlist();
+          showToast('Saved to wishlist');
+        });
+      });
+
+      // Cart toggles
+      $('#openCart').onclick = openCart;
+      $('#closeCart').onclick = closeCart;
+      $('#cartOverlay').onclick = closeCart;
+      $('#mobileOpenCart').onclick = openCart;
+
+      // Wishlist toggles
+      $('#openWishlist').onclick = openWishlist;
+      $('#closeWishlist').onclick = closeWishlist;
+      $('#wishlistOverlay').onclick = closeWishlist;
+
+      // Profile modal toggles
+      const profileModal = $('#profileModal');
+      const openProfile = () => { profileModal.classList.remove('hidden'); };
+      const closeProfile = () => { profileModal.classList.add('hidden'); };
+      $('#openProfile').onclick = openProfile;
+      $('#closeProfile').onclick = closeProfile;
+
+      // Demo profile save
+      $('#profileForm').onsubmit = async (e)=>{ 
+        e.preventDefault(); 
+        const name = $('#pfName').value.trim() || 'Guest'; 
+        await api.saveProfile(name);
+        $('#signedName').textContent = 'Hi, ' + name; 
+        $('#signedName').classList.remove('hidden'); 
+        closeProfile(); 
+        showToast('Profile saved'); 
+      };
+      $('#signOutBtn').onclick = async ()=>{ 
+        await api.clearProfile();
+        $('#signedName').classList.add('hidden'); 
+        $('#signedName').textContent = ''; 
+        closeProfile(); 
+        showToast('Signed out'); 
+      };
+
+      // Clear cart
+      $('#clearCart').onclick = async () => { 
+        await api.clearCart(); 
+        cart = (await api.listCart()).items; 
+        renderCart(); 
+      };
+
+      // Checkout modal
+      const checkoutModal = $('#checkoutModal');
+      const showModal = () => { checkoutModal.classList.remove('hidden'); };
+      const hideModal = () => { checkoutModal.classList.add('hidden'); $('#receiptActions').classList.add('hidden'); };
+
+      $('#checkoutBtn').onclick = () => {
+        if (cart.length === 0) { showToast('Your cart is empty'); return; }
+        $('#custName').value = currentUser?.name || '';
+        $('#pickupTime').selectedIndex = 0;
+        $('#receiptActions').classList.add('hidden');
+        showModal();
+      };
+      $('#closeCheckout').onclick = hideModal;
+      $('#cancelOrder').onclick = hideModal;
+
+      // Confirm order (Demo)
+      let lastReceiptText = '';
+      $('#confirmOrder').onclick = async () => {
+        const name = $('#custName').value.trim() || 'Guest';
+        const pickup = $('#pickupTime').value;
+        lastReceiptText = buildReceipt(name, pickup);
+        $('#receiptActions').classList.remove('hidden');
+        showToast('Order placed');
+        await api.clearCart();
+        cart = (await api.listCart()).items;
+        renderCart();
+      };
+
+      // Receipt actions
+      $('#copyReceipt').onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(lastReceiptText || 'No receipt available');
+          showToast('Receipt copied');
+        } catch {
+          showToast('Copy not available');
+        }
+      };
+      $('#openReceipt').onclick = () => {
+        const dataUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(lastReceiptText || 'No receipt available');
+        window.open(dataUrl, '_blank');
+      };
+
+      // Mobile menu
+      const mobileMenu = document.getElementById('mobileMenu');
+      const hamburger = document.getElementById('hamburger');
+      if (hamburger) hamburger.onclick = () => {
+        mobileMenu.classList.toggle('hidden');
+      };
+      ['mmCart','mmWishlist','mmProfile'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el) return;
+        el.onclick = () => {
+          mobileMenu.classList.add('hidden');
+          if(id==='mmCart') openCart();
+          if(id==='mmWishlist') openWishlist();
+          if(id==='mmProfile') document.getElementById('openProfile').click();
+        };
+      });
+      document.querySelectorAll('#mobileMenu a').forEach(a=> a.onclick = ()=> mobileMenu.classList.add('hidden'));
+
+      // API Docs modal
+      const apiModal = $('#apiDocsModal');
+      $('#openApiDocs').onclick = () => apiModal.classList.remove('hidden');
+      $('#closeApiDocs').onclick = () => apiModal.classList.add('hidden');
+      $('#closeApiDocs2').onclick = () => apiModal.classList.add('hidden');
+      $('#copyApiSpec').onclick = async () => {
+        const sample = `
+POST /api/profile
+{ "name": "Your Name" }
+
+GET /api/cart
+-> { "items": [...] }
+
+POST /api/cart
+{ "name": "Espresso", "price": 3.0 }
+
+PATCH /api/cart
+{ "name": "Espresso", "qty": 2 }
+
+GET /api/wishlist
+-> { "items": [...] }
+
+POST /api/wishlist
+{ "name": "Latte", "price": 4.2 }
+
+DELETE /api/wishlist
+{ "name": "Latte" }
+`.trim();
+        try { await navigator.clipboard.writeText(sample); showToast('Spec copied'); }
+        catch { showToast('Copy not available'); }
+      };
+
+      // Scroll helper
+      $('#seasonalScroll').onclick = () => document.querySelector('#specials').scrollIntoView({ behavior: 'smooth' });
+
+      // Directions
+      $('#directionsBtn').onclick = () => {
+        window.open('https://www.google.com/maps/search/?api=1&query=coffee+shop', '_blank');
+      };
+
+      // Initialize counts and lists from "backend"
+      cart = (await api.listCart()).items;
+      wishlist = (await api.listWishlist()).items;
+      $('#mmCartCount').textContent = cart.reduce((s, i)=> s + i.qty, 0);
+      $('#mmWishCount').textContent = wishlist.length;
+
+      // Initial render
+      renderCart();
+      renderWishlist();
+    });
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96c92db1b4797f44',t:'MTc1NDc2MjY5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
